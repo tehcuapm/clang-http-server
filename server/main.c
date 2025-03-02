@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -41,6 +42,15 @@ int main(void) {
   printf("Connexion acceptée de %s:%d\n",
        inet_ntoa(client_addr.sin_addr),
        ntohs(client_addr.sin_port));
+
+  char *response = "Bonjour, client !\n";
+  ssize_t bytes_sent = send(client_fd, response, strlen(response), 0);
+  if (bytes_sent < 0) {
+    perror("Erreur lors de l'envoi de la réponse");
+    close(client_fd);
+    close(sockfd);
+    exit(EXIT_FAILURE);
+  }
 
   close(client_fd);
   close(sockfd);
