@@ -39,11 +39,30 @@ int main(void) {
     exit(EXIT_FAILURE);
   }
 
-  printf("Connexion acceptée de %s:%d\n",
-       inet_ntoa(client_addr.sin_addr),
-       ntohs(client_addr.sin_port));
+  // A améliorer
+  char request[1000];
+  int bytes_received = recv(client_fd, request, 1000, 0);
+  if (bytes_received < 0) {
+    perror("recv");
+    exit(EXIT_FAILURE);
+  };
 
-  char *response = "Bonjour, client !\n";
+  request[bytes_received] = '\0';
+
+  char method[10];
+  char uri[50];
+  char version[20];
+
+  if (sscanf(request, "%s %s %s", method, uri, version) < 3) {
+    printf("Erreur lors du parsing.\n");
+  }
+
+  printf("Connexion acceptée de %s:%d\nMethod: %s\nUri: %s\nVersion: %s\n",
+        inet_ntoa(client_addr.sin_addr),
+        ntohs(client_addr.sin_port),
+        method, uri, version);
+
+  char *response = "HTTP/1.1 200 OK\n\nContent-type: text/html; charset=utf-8\r\n\r\n<html><body><h1>HELLO</h1></body></html>";
   ssize_t bytes_sent = send(client_fd, response, strlen(response), 0);
   if (bytes_sent < 0) {
     perror("Erreur lors de l'envoi de la réponse");

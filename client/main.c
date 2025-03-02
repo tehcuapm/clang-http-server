@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -23,7 +24,9 @@ int main(void) {
     exit(EXIT_FAILURE);
   };
 
-  if (write(sockclt, "hello", 5) < 0) {
+  char *message = "GET / HTTP/1.1";
+
+  if (write(sockclt, message, strlen(message)) < 0) {
     perror("write");
     exit(EXIT_FAILURE);
   };
